@@ -25,10 +25,11 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import {LoginForm} from '../interface/Login'
 
 const title: String = "登录系统";
 
-let loginForm = ref({
+let loginForm = ref<LoginForm>({
   name: "312",
   password: "123",
 });
