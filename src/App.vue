@@ -17,7 +17,7 @@ import Error from './views/Error.vue'
 import { ViewType } from './interface/View'
 
 // TODO 判断登录后信息展示 默认登录页面 
-let viewF: ViewType = ViewType.User;
+let viewF: ViewType = ViewType.Login;
 
 
 

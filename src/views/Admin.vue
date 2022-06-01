@@ -282,11 +282,11 @@ body {
 }
 
 .left {
-  min-height: 680px;
+  min-height: 800px;
 }
 
 .footer {
-  height: 20px;
+  height: 35px;
   background-color: rgba(247, 245, 230, 0.733);
   text-align: center;
   padding: 8px 0px 5px 0px;
