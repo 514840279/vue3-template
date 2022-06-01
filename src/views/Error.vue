@@ -1,8 +1,10 @@
 <template>
-    <div> home1 </div>
+    <div> error </div>
 </template>
 
 <script setup lang="ts">
+let errorCode: number, errorMsg: String;
+
 
 </script>
 

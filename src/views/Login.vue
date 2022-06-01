@@ -1,5 +1,7 @@
 <template>
-    <div> home1 </div>
+    <div>
+        <label for="123"></label>
+    </div>
 </template>
 
 <script setup lang="ts">

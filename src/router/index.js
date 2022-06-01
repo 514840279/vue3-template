@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
-import Index from '../views/index.vue'
+// import Index from '../views/index.vue'
+// import Admin from '../views/Admin.vue'
 import Home0 from '../views/home/Home0.vue'
 import Home1 from '../views/home/Home1.vue'
 import Home2 from '../views/home/Home2.vue'
@@ -9,6 +10,8 @@ import Home4 from '../views/home/Home4.vue'
 import Home5 from '../views/home/Home5.vue'
 import Home6 from '../views/home/Home6.vue'
 
+import Err from '../views/Error.vue'
+
 
 
 // 2. 定义一些路由
@@ -16,12 +19,16 @@ import Home6 from '../views/home/Home6.vue'
 // 我们后面再讨论嵌套路由。
 const routes = [
   {
-    path: '/',
-    redirect: '/index'   //重定向
-  }, {
-    path: '/index',
-    name: "index",
-    component: Index,
+  //   path: '/',
+  //   redirect: '/index'   //重定向
+  // }, {
+  //   path: '/index',
+  //   name: "index",
+  //   component: Index,
+  // }, {
+  //   path: '/admin',
+  //   name: "admin",
+  //   component: Admin,
   }, {
     path: '/home0',
     name: "home0",
@@ -50,6 +57,14 @@ const routes = [
     path: '/home6',
     name: "home6",
     component: Home6,
+  }, {
+    path: '/home7',
+    name: "home7",
+    component: () => import('../views/home/Home7.vue'),
+  },{
+    path: '/error',
+    name: "error",
+    component: Err,
   },{
     path: '/:catchAll(.*)',
     redirect: '/error'   //重定向
