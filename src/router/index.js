@@ -61,6 +61,10 @@ const routes = [
     path: '/home7',
     name: "home7",
     component: () => import('../views/home/Home7.vue'),
+  }, {
+    path: '/databasetype',
+    name: "databasetype",
+    component: () => import('../views/database/type/Index.vue'),
   },{
     path: '/error',
     name: "error",

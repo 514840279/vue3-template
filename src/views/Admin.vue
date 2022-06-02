@@ -20,7 +20,7 @@
             <!-- group menu -->
             <el-menu-item-group v-for="(group, ind) in subme.group" :key="ind" :title="group.title">
               <el-menu-item v-for="(data, i) in group.data" :key="i" :index="data.index">
-                <span :to="data.link">{{ data.text }}</span>
+                <span>{{ data.text }}</span>
               </el-menu-item>
             </el-menu-item-group>
             <!-- submenu -->
@@ -28,20 +28,24 @@
               <el-icon>
                 <component :is="data.icon"></component>
               </el-icon>
-              <span @click="handleBreadcrumb(subme, data)" :to="data.link">{{ data.text }}</span>
+              <span @click="handleBreadcrumb(subme, data)">{{ data.text }}</span>
             </el-menu-item>
           </el-sub-menu>
         </el-menu>
       </el-aside>
       <el-container>
         <el-main>
-          <!-- 面包屑 -->
-          <el-breadcrumb v-if="currentList.length > 0" separator="/">
-            <el-breadcrumb-item v-for="(item, i) in currentList" :key="i" :index="i" :to="{ path: item.path }">{{ item.text }}</el-breadcrumb-item>
-          </el-breadcrumb>
-          <!-- 路由出口 -->
-          <!-- 路由匹配到的组件将渲染在这里 -->
-          <router-view></router-view>
+          <el-card class="box-card">
+            <template #header>
+              <!-- 面包屑 -->
+              <el-breadcrumb v-if="currentList.length > 0" separator="/">
+                <el-breadcrumb-item v-for="(item, i) in currentList" :key="i" :index="i" :to="{ path: item.path }">{{ item.text }}</el-breadcrumb-item>
+              </el-breadcrumb>
+            </template>
+            <!-- 路由出口 -->
+            <!-- 路由匹配到的组件将渲染在这里 -->
+            <router-view></router-view>
+          </el-card>
         </el-main>
         <el-footer class="footer">
           <Foot />
@@ -121,10 +125,10 @@ const asides: Array<Aside> = [
         text: "数据管理",
         icon: "Message",
         data: [
-          { index: "2-1-1", text: "数据库", link: "/database" },
           { index: "2-1-2", text: "数据类型", link: "/databasetype" },
-          { index: "2-1-3", text: "表管理", link: "/tables" },
           { index: "2-1-4", text: "索引类型", link: "/userindex" },
+          { index: "2-1-1", text: "数据库", link: "/database" },
+          { index: "2-1-3", text: "表管理", link: "/tables" },
           { index: "2-1-5", text: "字段管理", link: "/columns" },
         ]
       },
@@ -262,7 +266,11 @@ function handleSelect(index: String): void {
 function handleBreadcrumb(submenu: Menu, data: MenuItem): void {
   currentList.value[1] = { text: submenu.text };
   currentList.value[2] = { text: data.text };
-
+  var path = data.link;
+  if (typeof path == 'string') {
+    // 更换默认页面
+    router.push(path);
+  }
 }
 
 
@@ -279,6 +287,14 @@ body {
 
 .el-header {
   padding: 0px;
+}
+
+.memu-card {
+  padding: 0px;
+
+  .el-card__body {
+    padding: 0px;
+  }
 }
 
 .left {
