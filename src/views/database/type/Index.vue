@@ -1,47 +1,59 @@
 <template>
     <div>
-        <el-row class="mb-4">
-            <el-button>Default</el-button>
-            <el-button type="primary">Primary</el-button>
-            <el-button type="success">Success</el-button>
-            <el-button type="info">Info</el-button>
-        </el-row>
-        <el-divider />
-        <el-table :data="tableData" :table-layout="tableLayout">
-            <el-table-column prop="date" label="Date" />
-            <el-table-column prop="name" label="Name" />
-            <el-table-column prop="address" label="Address" />
-        </el-table>
+        <Table :columns="columns" :rootUrl="rootUrl" :optionBtn="optionBtn" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import Table from '../../../components/table/Table.vue'
+import { Column } from '../../../interface/Table'
 
-const tableLayout = ref('fixed')
+let rootUrl: String = '/serve/sysDbmsTabsTypeInfo',
+    optionBtn = { // 操作控制按钮显示
+        search: true, // 开启查询功能
+        sort: true, // 开启排序功能
+        add: true, // 添加
+        page: true, // 翻页
+        opt: true, // 每条数据后端操作搭配optbtn使用
+        optbtn: { // 
+            info: true, // 详细
+            upd: true, // 修改
+            state: true, // 修改表中应有固定字段 delete_flag 默认值为0 逻辑删除字段 执行update 
+            del: true, // 删除 执行delete sql
+        }
+    },
+    columns: Array<Column> = [{
+        name: "uuid",
+        title: "uuid",
+        align: 'left',
+        show: false,
+    }, {
+        name: "typeName",
+        title: "类型名",
+        align: 'left',
+        sort: true,
+        search: true
+    }, {
+        name: "typeIcon",
+        title: "icon",
+        align: 'center',
+        sort: true,
+        search: true
+    }, {
+        name: "typeClass",
+        title: "class",
+        align: 'left',
+        sort: true,
+        search: true
+    }, {
+        name: "typeOrder",
+        title: "显示顺序",
+        align: 'left',
+        sort: true,
+        search: true
+    }];
 
-const tableData = [
-    {
-        date: '2016-05-03',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-        date: '2016-05-02',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-        date: '2016-05-04',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-    {
-        date: '2016-05-01',
-        name: 'Tom',
-        address: 'No. 189, Grove St, Los Angeles',
-    },
-]
+
 </script>
 
 <style scoped>
