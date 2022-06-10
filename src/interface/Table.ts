@@ -5,7 +5,7 @@ export interface PageParam{
     totalElements: Number,
     info?: Object,
     sortList?: Array<SortColumn>,
-    searchList?: Array<SearchColumn>
+    searchList?: Array<SearchParamters>
 }
 export interface Column{
     name: String,
@@ -37,6 +37,16 @@ export interface SearchColumn{
     searchDataDefault?:String,
     searchDataArray?:String,
     searchPlaceholder?: String,
+}
+
+export interface SearchParamters{
+    operator: String,
+    column: String,
+    title: String,
+    symbol: String,
+    data: String,
+    searchPlaceholder?: String,
+    showdata: Boolean
 }
 
 export interface TableProps{

@@ -4,28 +4,28 @@
             <div :class="show == 'page' ? 'transition-box' : null" v-show="show == 'page'">
                 <el-row>
                     <el-col :span="24" style="text-align: right;margin-right:10px;">
-                        <el-button title="查询" @click="handleShowShearch()" icon="Search" circle size="mini"></el-button>
-                        <el-button title="排序" @click="handleShowSort()" v-if="localOptionBtn.sort" icon="Sort" circle size="mini"></el-button>
-                        <el-button title="重置" @click="resetTable()" icon="Setting" circle size="mini"></el-button>
-                        <el-button title="添加" v-if="localOptionBtn.add" @click="handleAdd()" type="success" icon="CirclePlusFilled" circle size="mini"></el-button>
-                        <el-button title="刷新" @click="initTable()" icon="Refresh" circle size="mini"></el-button>
-                        <!-- <el-button title="打印" @click="printTable()" icon="Printer" circle size="mini"  ></el-button> -->
-                        <!-- <el-button title="导出" icon="Download" circle size="mini"  ></el-button> -->
-                        <!-- <TableColumnSelect v-model:columns="showColumns" circle size="mini"></TableColumnSelect> -->
+                        <el-button title="查询" @click="handleShowShearch()" icon="Search" circle size="small"></el-button>
+                        <el-button title="排序" @click="handleShowSort()" v-if="localOptionBtn.sort" icon="Sort" circle size="small"></el-button>
+                        <el-button title="重置" @click="resetTable()" icon="Setting" circle size="small"></el-button>
+                        <el-button title="添加" v-if="localOptionBtn.add" @click="handleAdd()" type="success" icon="CirclePlusFilled" circle size="small"></el-button>
+                        <el-button title="刷新" @click="initTable()" icon="Refresh" circle size="small"></el-button>
+                        <!-- <el-button title="打印" @click="printTable()" icon="Printer" circle size="small"  ></el-button> -->
+                        <!-- <el-button title="导出" icon="Download" circle size="small"  ></el-button> -->
+                        <TableColumnSelect v-model:columns="showColumns" circle size="small"></TableColumnSelect>
                     </el-col>
                 </el-row>
-                <!-- <TableSearchParameters v-if="localOptionBtn.search && showSearch" :searchColumns="searchColumns" v-model:searchParameters="searchParameters" @searchTable="initTable"></TableSearchParameters> -->
-                <!-- <TableSortParameters v-if="localOptionBtn.sort && showSort" :sortColumns="sortColumns" v-model:sortParameters="sortParameters" @sortTable="initTable"></TableSortParameters> -->
+                <TableSearchParameters v-if="localOptionBtn.search && showSearch" :searchColumns="searchColumns" v-model:searchParameters="searchParameters" @searchTable="initTable"></TableSearchParameters>
+                <TableSortParameters v-if="localOptionBtn.sort && showSort" :sortColumns="sortColumns" v-model:sortParameters="sortParameters" @sortTable="initTable"></TableSortParameters>
                 <div id="Table" ref="print">
                     <el-table id="tableid" v-loading="loading" :data="dataList" style="width: 100%">
                         <el-table-column v-for="(column, ind) in activeColumns" :key="ind" :prop="column.name" :label="column.title" :width="column.width == null ? '' : column.width" :align="column.align == null ? 'left' : column.align" :resizable="column.resizable == null ? false : column.resizable">
                         </el-table-column>
                         <el-table-column fixed="right" label="操作" width="124">
                             <template #default="scope">
-                                <el-button @click="handleUpd(scope.row)" type="success" icon="Edit" circle size="mini" title="修改"></el-button>
-                                <el-button @click="handleStateToDown(scope.row)" v-if="scope.row.deleteFlag == 0 || scope.row.deleteFlag == null" type="warning" icon="View" circle size="mini" title="已启用"></el-button>
-                                <el-button @click="handleStateToUp(scope.row)" v-if="scope.row.deleteFlag == 1" type="info" icon="View" circle size="mini" title="已禁用"></el-button>
-                                <el-button @click="handleDelete(scope.row)" type="danger" icon="Delete" circle size="mini" title="删除"></el-button>
+                                <el-button @click="handleUpd(scope.row)" type="success" icon="Edit" circle size="small" title="修改"></el-button>
+                                <el-button @click="handleStateToDown(scope.row)" v-if="scope.row.deleteFlag == 0 || scope.row.deleteFlag == null" type="warning" icon="View" circle size="small" title="已启用"></el-button>
+                                <el-button @click="handleStateToUp(scope.row)" v-if="scope.row.deleteFlag == 1" type="info" icon="View" circle size="small" title="已禁用"></el-button>
+                                <el-button @click="handleDelete(scope.row)" type="danger" icon="Delete" circle size="small" title="删除"></el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -37,8 +37,8 @@
             </div>
         </transition>
         <transition name="el-zoom-in-top">
-            <div :class="show == 'edit' ? 'transition-box' : null" v-show="show == 'edit'">
-                <TableSave v-show="show == 'edit'" :columns="columns" v-model:info="currentRow" @onSave="handleSave" @onCancel="initTable"> </TableSave>
+            <div :class="show == 'edit' ? 'transition-box' : null" v-if="show == 'edit'">
+                <TableSave v-if="show == 'edit'" :columns="columns" v-model:info="currentRow" @onSave="handleSave" @onCancel="initTable"> </TableSave>
             </div>
         </transition>
     </div>
@@ -46,8 +46,13 @@
 
 <script lang="ts" setup>
 import { onBeforeMount, ref, computed } from 'vue';
-import { PageParam, Column, SortColumn, SearchColumn } from '../../interface/Table'
+import { PageParam, Column, SortColumn, SearchColumn, SearchParamters } from '../../interface/Table'
 import axios from 'axios';
+import TableSave from './TableSave.vue'
+import TableColumnSelect from './TableColumnSelect.vue'
+import TableSearchParameters from './TableSearchParameters.vue'
+import TableSortParameters from './TableSortParameters.vue'
+
 
 
 
@@ -55,7 +60,7 @@ const parents = withDefaults(defineProps<{
     rootUrl?: String,
     page?: PageParam,
     columns?: Array<Column>,
-    optionBtn?: Object
+    optionBtn?: any
 }>(), {
     rootUrl: () => "",
     page: () => {
@@ -95,19 +100,7 @@ let url = {
     delAll: parents.rootUrl + "/deleteAll",
 };
 // 按钮控制
-let localOptionBtn: any = {
-    search: true, // 开启查询功能
-    sort: true, // 开启排序功能
-    add: true, // 添加
-    page: true, // 翻页
-    opt: true, // 每条数据后端操作搭配optbtn使用
-    optbtn: { // 
-        info: true, // 详细
-        upd: true, // 修改
-        state: true, // 修改表中应有固定字段 delete_flag 默认值为0 逻辑删除字段 执行update 
-        del: true, // 删除 执行delete sql
-    },
-},
+let localOptionBtn = ref<any>(parents.optionBtn),
     // 请求参数
     param: PageParam = {
         pageNumber: 1,
@@ -120,11 +113,11 @@ let localOptionBtn: any = {
 // 表格数据
 let dataList = ref<Array<any>>([]),
     // 编辑的数据
-    currentRow = {},
+    currentRow = ref<any>({}),
     // 默认展示页面信息
-    show = 'page',
+    show = ref<string>('page'),
     // 绑定显示隐藏columns名称
-    showColumns: Array<Column> = [],
+    showColumns = ref<Array<Column>>(parents.columns),
     // 搜索columns名称 类型有type= text integer integerrange date datetime  daterange select redio checkbox 
     /*{
         name= name,                                 
@@ -137,8 +130,8 @@ let dataList = ref<Array<any>>([]),
         // search-data-array= ['','']
      }*/
     searchColumns: Array<SearchColumn> = [],
-    searchParameters: Array<SearchColumn> = [],
-    showSearch: Boolean = false,
+    searchParameters: Array<SearchParamters> = [],
+    showSearch = ref<Boolean>(false),
     // 排序columns名称
     /*{
         name=name,
@@ -148,11 +141,9 @@ let dataList = ref<Array<any>>([]),
     } */
     sortColumns: Array<SortColumn> = [],
     sortParameters: Array<SortColumn> = [],
-    showSort: Boolean = false;
+    showSort = ref<Boolean>(false);
 
 onBeforeMount(() => {
-    showColumns = parents.columns;
-    localOptionBtn = parents.optionBtn;
     // innt
     init();
     // befor
@@ -163,7 +154,7 @@ onBeforeMount(() => {
 // 初始化参数
 function init(): void {
     // 查询条件
-    showColumns.forEach((item, index) => {
+    showColumns.value.forEach((item, index) => {
         // 排序查询条件
         if (item.sort != null) {
             // 默认值是 “asc” 
@@ -197,16 +188,16 @@ function init(): void {
     });
     // 查询框可选控制
     if (searchColumns.length == 0) {
-        localOptionBtn.search = false;
+        localOptionBtn.value.search = false;
     }
     // 排序区域可选控制
     if (sortColumns.length == 0) {
-        localOptionBtn.sort = false;
+        localOptionBtn.value.sort = false;
     }
 }
 // 异步查询表格
 function initTable(): void {
-    show = 'page';
+    show.value = 'page';
     loading = true;
     param.sortList = sortParameters;
     param.searchList = searchParameters;
@@ -228,13 +219,13 @@ function initTable(): void {
 }
 // 显示 、隐藏 收索条件框
 function handleShowShearch(): void {
-    showSort = false;
-    showSearch = !showSearch;
+    showSort.value = false;
+    showSearch.value = !showSearch.value;
 }
 // 显示 、隐藏 排序条件框
 function handleShowSort(): void {
-    showSearch = false;
-    showSort = !showSort;
+    showSearch.value = false;
+    showSort.value = !showSort.value;
 }
 // 每页大小
 function handleSizeChange(val: Number): void {
@@ -247,24 +238,23 @@ function handleCurrentChange(val: number): void {
     initTable();
 }
 // 更新行> 更新页面数据传递
-function handleUpd(row: Object): void {
-    currentRow = row;
-    show = 'edit';
+function handleUpd(row: any): void {
+    currentRow.value = row;
+    show.value = 'edit';
 }
 // 添加行
 function handleAdd(): void {
-    currentRow = {};
-    show = 'edit';
+    currentRow.value = {};
+    show.value = 'edit';
 }
 // 修改数据
 function handleSave(): void {
-    upd(currentRow);
+    upd(currentRow.value);
 }
 // 删除单行数据
 function handleDelete(row: Object): void {
     loading = true;
     axios.post(url.del, row).then((reponse) => {
-        debugger
         if (reponse.status == 200 && reponse.data != null && reponse.data.code == 200) {
             initTable();
         }
@@ -284,7 +274,6 @@ function handleStateToDown(row: any): void {
 }
 // 数据更新
 function upd(row: any): void {
-
     loading = true;
     axios.post(url.upd, row).then((reponse) => {
         if (reponse.data.code == 200) {
@@ -297,14 +286,14 @@ function upd(row: any): void {
 // 参数重置
 function resetTable(): void {
     loading = true;
-    showSearch = false;
-    showSort = false;
+    showSearch.value = false;
+    showSort.value = false;
     param = parents.page;
     sortParameters = [];
     searchParameters = [];
     initTable();
     // showSort = true;
-    showSearch = true;
+    showSearch.value = true;
 }
 // 打印表格
 function printTable(): void {
@@ -313,7 +302,7 @@ function printTable(): void {
 
 const activeColumns = computed<Column[]>(() => {
     let temp: Column[] = new Array();
-    showColumns.forEach(column => {
+    showColumns.value.forEach(column => {
         if (column.show) {
             temp.push(column);
         }
