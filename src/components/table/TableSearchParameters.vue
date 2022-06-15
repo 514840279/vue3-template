@@ -1,17 +1,17 @@
 <template>
     <div id="TableSearchParameters">
-        <el-row v-for="(item, index) in parameters" :key="index" class="prow">
+        <el-row v-for="(item, index) in parents.searchParameters" :key="index" class="prow">
             <el-col :span="1">
-                <el-button v-if="index > 0" @click="handleSearchOperator(item, index)" size="mini">{{ item.operator }}</el-button>
+                <el-button v-if="index > 0" @click="handleSearchOperator(item, index)" size="small">{{ item.operator }}</el-button>
             </el-col>
             <el-col :span="4">
-                <TableSearchColumnSelect :columns="columns" :item="item" :index="index" v-model:parameters="parameters"></TableSearchColumnSelect>
+                <TableSearchColumnSelect :columns="columns" :item="item" :index="index" v-model:parameters="parents.searchParameters"></TableSearchColumnSelect>
             </el-col>
             <el-col :span="3">
-                <TableSearchSymbolSelect :item="item" :index="index" v-model:parameters="parameters"></TableSearchSymbolSelect>
+                <TableSearchSymbolSelect :item="item" :index="index" v-model:parameters="parents.searchParameters"></TableSearchSymbolSelect>
             </el-col>
             <el-col :span="6" v-if="item.showdata">
-                <el-input size="mini" v-model="item.data" :placeholder="item.searchPlaceholder" />
+                <el-input size="small" v-model="item.data" :placeholder="item.searchPlaceholder" />
             </el-col>
             <el-col :span="1">
                 <el-button @click="handleDelSearch(item, index)" icon="Remove" circle size="small" title="删除"></el-button>
@@ -43,7 +43,7 @@ const parents = withDefaults(defineProps<{
 
 let
     columns = ref<Array<SearchColumn>>([]),
-    parameters = ref<Array<SearchParamters>>([]),
+    // parameters = ref<Array<SearchParamters>>([]),
     plusNum = ref<number>(0),
     columnsSize = ref<number>(0);
 
@@ -52,7 +52,7 @@ const emit = defineEmits(["searchTable"]);
 
 onMounted(() => {
     columns.value = parents.searchColumns;
-    parameters.value = parents.searchParameters;
+    // parameters.value = parents.searchParameters;
 
 });
 
@@ -67,7 +67,7 @@ function handleAddSearch() {
         plusNum.value = 0;
     }
     let column = columns.value[plusNum.value];
-    parameters.value.push({
+    parents.searchParameters.push({
         operator: 'and',
         column: column.searchName,
         title: column.searchTitle,
@@ -91,11 +91,11 @@ function handleSearchOperator(item: SearchParamters, index: number) {
     } else {
         item.operator = 'and';
     }
-    parameters.value.splice(index, 1, item);
+    parents.searchParameters.splice(index, 1, item);
 }
 // 删除条件
 function handleDelSearch(item: SearchParamters, index: number) {
-    parameters.value.splice(index, 1);
+    parents.searchParameters.splice(index, 1);
 }
 
 </script>

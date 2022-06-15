@@ -1,11 +1,11 @@
 <template>
     <div id="TableSortParameters">
-        <el-row v-for="(item, index) in parameters" :key="index" class="prow">
+        <el-row v-for="(item, index) in parents.sortParameters" :key="index" class="prow">
             <el-col :span="1">
                 <el-button v-if="index > 0" @click="handleTopSort(item, index)" icon="CaretTop" circle size="small" title="添加"></el-button>
             </el-col>
             <el-col :span="6">
-                <TableSortColumnSelect :sortColumns="sortColumns" :item="item" :index="index" v-model:parameters="parameters"></TableSortColumnSelect>
+                <TableSortColumnSelect :sortColumns="sortColumns" :item="item" :index="index" v-model:parameters="parents.sortParameters"></TableSortColumnSelect>
             </el-col>
             <el-col :span="1">
                 <el-button @click="handleSortOrder(item, index)" size="small">{{ item.sortOrder }}</el-button>
@@ -36,7 +36,6 @@ const parents = withDefaults(defineProps<{
 });
 let
     columns = ref<Array<SortColumn>>([]),
-    parameters = ref<Array<SortColumn>>([]),
     orderSize = ref<number>(0),
     plusNum = ref<number>(0),
     columnsSize = ref<number>(0);
@@ -45,7 +44,6 @@ const emit = defineEmits(["sortTable"]);
 
 onMounted(() => {
     columns.value = parents.sortColumns;
-    parameters.value = parents.sortParameters;
     orderSize.value = 0;
     plusNum.value = 0;
     columnsSize.value = 0;
@@ -68,13 +66,13 @@ function handleAddSort() {
     for (let index = 0; index < parents.sortColumns.length; index++) {
         const i1 = parents.sortColumns[index];
         let a: Boolean = true;
-        parameters.value.forEach(item => {
+        parents.sortParameters.forEach(item => {
             if (item.sortName === i1.sortName) {
                 a = false;
             }
         })
         if (a) {
-            parameters.value.push(i1);
+            parents.sortParameters.push(i1);
             // 计算数量的
             orderSize.value++;
             // 循环下标控制
@@ -87,25 +85,24 @@ function handleAddSort() {
 
 // 删除排序条件
 function handleDelSort(item: SortColumn, index: number) {
-    parameters.value.splice(index, 1);
+    parents.sortParameters.splice(index, 1);
     orderSize.value--;
     handleSortIndex();
 };
 
 // 条件前移
 function handleTopSort(item: SortColumn, index: number) {
-    debugger
-    parameters.value.splice(index, 1);
-    parameters.value.splice(index - 1, 0, item);
+    parents.sortParameters.splice(index, 1);
+    parents.sortParameters.splice(index - 1, 0, item);
     handleSortIndex();
 };
 
 // 排序
 function handleSortIndex() {
     let a = 1;
-    parameters.value.forEach(item => {
+    parents.sortParameters.forEach(item => {
         item.sortIndex = a;
-        parameters.value.splice(a - 1, 1, item);
+        parents.sortParameters.splice(a - 1, 1, item);
         a++;
     });
 };

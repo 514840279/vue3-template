@@ -1,6 +1,6 @@
 <template>
     <div id="TableSearchSymbolSelect">
-        <el-select v-model="item.symbol" size="mini" style="width:100%" @change="handleChangeSymbol">
+        <el-select v-model="item.symbol" size="small" style="width:100%" @change="handleChangeSymbol">
             <el-option v-for="(sy, idx) in symbols" :key="idx" :label="sy.label" :value="sy.value">
             </el-option>
         </el-select>

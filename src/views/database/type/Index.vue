@@ -11,6 +11,7 @@ import { Column } from '../../../interface/Table'
 let rootUrl: String = '/serve/sysDbmsTabsTypeInfo',
     optionBtn = { // 操作控制按钮显示
         search: true, // 开启查询功能
+        searchParam: true, // 开启查询功能
         sort: true, // 开启排序功能
         add: true, // 添加
         page: true, // 翻页
@@ -50,7 +51,7 @@ let rootUrl: String = '/serve/sysDbmsTabsTypeInfo',
         title: "显示顺序",
         align: 'left',
         sort: true,
-        search: true
+        // search: true
     }];
 
 

@@ -3,18 +3,23 @@
         <transition name="el-zoom-in-top">
             <div :class="show == 'page' ? 'transition-box' : null" v-show="show == 'page'">
                 <el-row>
-                    <el-col :span="24" style="text-align: right;margin-right:10px;">
-                        <el-button title="查询" @click="handleShowShearch()" icon="Search" circle size="small"></el-button>
-                        <el-button title="排序" @click="handleShowSort()" v-if="localOptionBtn.sort" icon="Sort" circle size="small"></el-button>
-                        <el-button title="重置" @click="resetTable()" icon="Setting" circle size="small"></el-button>
-                        <el-button title="添加" v-if="localOptionBtn.add" @click="handleAdd()" type="success" icon="CirclePlusFilled" circle size="small"></el-button>
-                        <el-button title="刷新" @click="initTable()" icon="Refresh" circle size="small"></el-button>
-                        <!-- <el-button title="打印" @click="printTable()" icon="Printer" circle size="small"  ></el-button> -->
-                        <!-- <el-button title="导出" icon="Download" circle size="small"  ></el-button> -->
-                        <TableColumnSelect v-model:columns="showColumns" circle size="small"></TableColumnSelect>
+                    <el-col :span="18">
+                        <TableSearch :searchColumns="searchColumns" v-model:searchParameters="searchParameters" @searchTable="initTable"></TableSearch>
+                    </el-col>
+                    <el-col :span="6">
+                        <div style="text-align: right; margin-right: 10px;">
+                            <el-button title="查询" @click="handleShowShearch()" :type="searchBtnType" icon="Search" circle size="small"></el-button>
+                            <el-button title="排序" @click="handleShowSort()" :type="sortBtnType" v-if="localOptionBtn.sort" icon="Sort" circle size="small"></el-button>
+                            <el-button title="重置" @click="resetTable()" icon="Setting" circle size="small"></el-button>
+                            <el-button title="添加" v-if="localOptionBtn.add" @click="handleAdd()" type="success" icon="CirclePlusFilled" circle size="small"></el-button>
+                            <el-button title="刷新" @click="initTable()" icon="Refresh" circle size="small"></el-button>
+                            <!-- <el-button title="打印" @click="printTable()" icon="Printer" circle size="small"  ></el-button> -->
+                            <!-- <el-button title="导出" icon="Download" circle size="small"  ></el-button> -->
+                            <TableColumnSelect v-model:columns="showColumns" circle size="small"></TableColumnSelect>
+                        </div>
                     </el-col>
                 </el-row>
-                <TableSearchParameters v-if="localOptionBtn.search && showSearch" :searchColumns="searchColumns" v-model:searchParameters="searchParameters" @searchTable="initTable"></TableSearchParameters>
+                <TableSearchParameters v-if="localOptionBtn.searchParam && showSearch" :searchColumns="searchColumns" v-model:searchParameters="searchParameters" @searchTable="initTable"></TableSearchParameters>
                 <TableSortParameters v-if="localOptionBtn.sort && showSort" :sortColumns="sortColumns" v-model:sortParameters="sortParameters" @sortTable="initTable"></TableSortParameters>
                 <div id="Table" ref="print">
                     <el-table id="tableid" v-loading="loading" :data="dataList" style="width: 100%">
@@ -29,9 +34,13 @@
                             </template>
                         </el-table-column>
                     </el-table>
-                    <div v-if="localOptionBtn.page">
-                        <el-pagination class="pagex" background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="param.pageNumber" :page-sizes="page.sizes" :page-size="param.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="param.totalElements" :hide-on-single-page="true">
-                        </el-pagination>
+                    <div v-if="localOptionBtn.page" class="apagination">
+                        <el-row>
+                            <el-col :span="12" :offset="12">
+                                <el-pagination class="pagex" background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="param.pageNumber" :page-sizes="page.sizes" :page-size="param.pageSize" :pager-count="3" layout="total, sizes, prev, pager, next, jumper" :total="param.totalElements">
+                                </el-pagination>
+                            </el-col>
+                        </el-row>
                     </div>
                 </div>
             </div>
@@ -47,11 +56,13 @@
 <script lang="ts" setup>
 import { onBeforeMount, ref, computed } from 'vue';
 import { PageParam, Column, SortColumn, SearchColumn, SearchParamters } from '../../interface/Table'
-import axios from 'axios';
+// import axios from 'axios';
+import http from '../../plugins/http';
 import TableSave from './TableSave.vue'
 import TableColumnSelect from './TableColumnSelect.vue'
 import TableSearchParameters from './TableSearchParameters.vue'
 import TableSortParameters from './TableSortParameters.vue'
+import TableSearch from './TableSearch.vue'
 
 
 
@@ -75,6 +86,7 @@ const parents = withDefaults(defineProps<{
     optionBtn: () => {
         return {
             search: true, // 开启查询功能
+            searchParam: true, // 开启查询功能
             sort: true, // 开启排序功能
             add: true, // 添加
             page: true, // 翻页
@@ -109,7 +121,7 @@ let localOptionBtn = ref<any>(parents.optionBtn),
         totalElements: 0
     },
     // 表加载
-    loading: Boolean = false
+    loading = ref<Boolean>(true);
 // 表格数据
 let dataList = ref<Array<any>>([]),
     // 编辑的数据
@@ -130,8 +142,9 @@ let dataList = ref<Array<any>>([]),
         // search-data-array= ['','']
      }*/
     searchColumns: Array<SearchColumn> = [],
-    searchParameters: Array<SearchParamters> = [],
+    searchParameters = ref<Array<SearchParamters>>([]),
     showSearch = ref<Boolean>(false),
+    searchBtnType = ref<String>(),
     // 排序columns名称
     /*{
         name=name,
@@ -140,7 +153,8 @@ let dataList = ref<Array<any>>([]),
         sort-order：'asc'/desc 
     } */
     sortColumns: Array<SortColumn> = [],
-    sortParameters: Array<SortColumn> = [],
+    sortParameters = ref<Array<SortColumn>>([]),
+    sortBtnType = ref<String>(),
     showSort = ref<Boolean>(false);
 
 onBeforeMount(() => {
@@ -198,34 +212,47 @@ function init(): void {
 // 异步查询表格
 function initTable(): void {
     show.value = 'page';
-    loading = true;
-    param.sortList = sortParameters;
-    param.searchList = searchParameters;
+    loading.value = true;
+    param.sortList = sortParameters.value;
+    param.searchList = searchParameters.value;
 
-    axios.post(url.page, param).then((reponse) => {
-        if (reponse.status == 200 && reponse.data != null && reponse.data.code == 200) {
-            dataList.value = reponse.data.data.content;
-            var size = reponse.data.data.totalElements;
+    http.post<any>(url.page, param).then((reponse) => {
+        debugger
+        if (reponse.data != null && reponse.code == 200) {
+            dataList.value = reponse.data.content;
+            var size = reponse.data.totalElements;
             if (size > 0 && dataList.value.length == 0) {
                 param.pageNumber = param.pageNumber - 1;
                 initTable();
             }
-            param.totalElements = reponse.data.data.totalElements;
+            param.totalElements = reponse.data.totalElements;
+            loading.value = false;
         }
     }).catch((err) => {
         // TODO
     });
-    loading = false;
 }
 // 显示 、隐藏 收索条件框
 function handleShowShearch(): void {
     showSort.value = false;
+    sortBtnType.value = "";
     showSearch.value = !showSearch.value;
+    if (showSearch.value) {
+        searchBtnType.value = "success";
+    } else {
+        searchBtnType.value = "";
+    }
 }
 // 显示 、隐藏 排序条件框
 function handleShowSort(): void {
     showSearch.value = false;
+    searchBtnType.value = "";
     showSort.value = !showSort.value;
+    if (showSort.value) {
+        sortBtnType.value = "success";
+    } else {
+        sortBtnType.value = "";
+    }
 }
 // 每页大小
 function handleSizeChange(val: Number): void {
@@ -253,9 +280,9 @@ function handleSave(): void {
 }
 // 删除单行数据
 function handleDelete(row: Object): void {
-    loading = true;
-    axios.post(url.del, row).then((reponse) => {
-        if (reponse.status == 200 && reponse.data != null && reponse.data.code == 200) {
+    loading.value = true;
+    http.delete(url.del, row).then((reponse: any) => {
+        if (reponse.data != null && reponse.code == 200) {
             initTable();
         }
     }).catch((err) => {
@@ -274,9 +301,9 @@ function handleStateToDown(row: any): void {
 }
 // 数据更新
 function upd(row: any): void {
-    loading = true;
-    axios.post(url.upd, row).then((reponse) => {
-        if (reponse.data.code == 200) {
+    loading.value = true;
+    http.post(url.upd, row).then((reponse: any) => {
+        if (reponse.code == 200) {
             initTable();
         }
     }).catch((err) => {
@@ -285,15 +312,28 @@ function upd(row: any): void {
 }
 // 参数重置
 function resetTable(): void {
-    loading = true;
-    showSearch.value = false;
-    showSort.value = false;
-    param = parents.page;
-    sortParameters = [];
-    searchParameters = [];
+    loading.value = true;
+    // showSearch.value = false;
+    // showSort.value = false;
+    // param = parents.page;
+    sortParameters.value = [];
+    searchParameters.value = [];
+    searchColumns.forEach((column, index) => {
+        if (index < 5) {
+            searchParameters.value.push({
+                operator: 'and',
+                column: column.searchName,
+                title: column.searchTitle,
+                symbol: "like",
+                data: "",
+                searchPlaceholder: column.searchPlaceholder,
+                showdata: true,
+            })
+        }
+    });
     initTable();
     // showSort = true;
-    showSearch.value = true;
+    // showSearch.value = false;
 }
 // 打印表格
 function printTable(): void {
@@ -313,4 +353,7 @@ const activeColumns = computed<Column[]>(() => {
 </script>
 
 <style scoped>
+.apagination {
+    margin-top: 8px;
+}
 </style>
