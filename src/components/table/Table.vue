@@ -4,12 +4,12 @@
             <div :class="show == 'page' ? 'transition-box' : null" v-show="show == 'page'">
                 <el-row>
                     <el-col :span="18">
-                        <TableSearch :searchColumns="searchColumns" v-model:searchParameters="searchParameters" @searchTable="initTable"></TableSearch>
+                        <TableSearch v-if="localOptionBtn.search" :searchColumns="searchColumns" v-model:searchParameters="searchParameters" @searchTable="initTable"></TableSearch>
                     </el-col>
                     <el-col :span="6">
                         <div style="text-align: right; margin-right: 10px;">
-                            <el-button title="查询" @click="handleShowShearch()" :type="searchBtnType" icon="Search" circle size="small"></el-button>
-                            <el-button title="排序" @click="handleShowSort()" :type="sortBtnType" v-if="localOptionBtn.sort" icon="Sort" circle size="small"></el-button>
+                            <el-button title="查询" v-if="localOptionBtn.searchParam" @click="handleShowShearch()" :type="searchBtnType" icon="Search" circle size="small"></el-button>
+                            <el-button title="排序" v-if="localOptionBtn.sort" @click="handleShowSort()" :type="sortBtnType" icon="Sort" circle size="small"></el-button>
                             <el-button title="重置" @click="resetTable()" icon="Setting" circle size="small"></el-button>
                             <el-button title="添加" v-if="localOptionBtn.add" @click="handleAdd()" type="success" icon="CirclePlusFilled" circle size="small"></el-button>
                             <el-button title="刷新" @click="initTable()" icon="Refresh" circle size="small"></el-button>
@@ -25,12 +25,12 @@
                     <el-table id="tableid" v-loading="loading" :data="dataList" style="width: 100%">
                         <el-table-column v-for="(column, ind) in activeColumns" :key="ind" :prop="column.name" :label="column.title" :width="column.width == null ? '' : column.width" :align="column.align == null ? 'left' : column.align" :resizable="column.resizable == null ? false : column.resizable">
                         </el-table-column>
-                        <el-table-column fixed="right" label="操作" width="124">
+                        <el-table-column fixed="right" label="操作" width="124" v-if="localOptionBtn.opt">
                             <template #default="scope">
-                                <el-button @click="handleUpd(scope.row)" type="success" icon="Edit" circle size="small" title="修改"></el-button>
-                                <el-button @click="handleStateToDown(scope.row)" v-if="scope.row.deleteFlag == 0 || scope.row.deleteFlag == null" type="warning" icon="View" circle size="small" title="已启用"></el-button>
-                                <el-button @click="handleStateToUp(scope.row)" v-if="scope.row.deleteFlag == 1" type="info" icon="View" circle size="small" title="已禁用"></el-button>
-                                <el-button @click="handleDelete(scope.row)" type="danger" icon="Delete" circle size="small" title="删除"></el-button>
+                                <el-button @click="handleUpd(scope.row)" v-if="localOptionBtn.optbtn.upd" type="success" icon="Edit" circle size="small" title="修改"></el-button>
+                                <el-button @click="handleStateToDown(scope.row)" v-if="localOptionBtn.optbtn.state && scope.row.deleteFlag == 0 || scope.row.deleteFlag == null" type="warning" icon="View" circle size="small" title="已启用"></el-button>
+                                <el-button @click="handleStateToUp(scope.row)" v-if="localOptionBtn.optbtn.state && scope.row.deleteFlag == 1" type="info" icon="View" circle size="small" title="已禁用"></el-button>
+                                <el-button @click="handleDelete(scope.row)" v-if="localOptionBtn.optbtn.del" type="danger" icon="Delete" circle size="small" title="删除"></el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -83,22 +83,7 @@ const parents = withDefaults(defineProps<{
         }
     },
     columns: () => [],
-    optionBtn: () => {
-        return {
-            search: true, // 开启查询功能
-            searchParam: true, // 开启查询功能
-            sort: true, // 开启排序功能
-            add: true, // 添加
-            page: true, // 翻页
-            opt: true, // 每条数据后端操作搭配optbtn使用
-            optbtn: { // 
-                info: true, // 详细
-                upd: true, // 修改
-                state: true, // 修改表中应有固定字段 delete_flag 默认值为0 逻辑删除字段 执行update 
-                del: true, // 删除 执行delete sql
-            }
-        }
-    }
+    optionBtn: () => { }
 
 });
 
@@ -112,7 +97,23 @@ let url = {
     delAll: parents.rootUrl + "/deleteAll",
 };
 // 按钮控制
-let localOptionBtn = ref<any>(parents.optionBtn),
+let localOptionBtn = ref<any>({
+    search: true, // 开启查询功能
+    searchParam: true, // 开启查询功能
+    sort: true, // 开启排序功能
+    add: true, // 添加
+    page: true, // 翻页
+    opt: true, // 每条数据后端操作搭配optbtn使用
+    optbtn: { // 
+        info: true, // 详细
+        upd: true, // 修改
+        state: true, // 修改表中应有固定字段 delete_flag 默认值为0 逻辑删除字段 执行update 
+        del: true, // 删除 执行delete sql
+    },
+    // ... 放在最后去覆盖前面的参数
+    ...parents.optionBtn
+
+}),
     // 请求参数
     param: PageParam = {
         pageNumber: 1,
