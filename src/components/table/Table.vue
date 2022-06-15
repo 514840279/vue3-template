@@ -55,7 +55,7 @@
 
 <script lang="ts" setup>
 import { onBeforeMount, ref, computed } from 'vue';
-import { PageParam, Column, SortColumn, SearchColumn, SearchParamters } from '../../interface/Table'
+import { PageParam, Column, SortColumn, SearchColumn, SearchParamters, OptionBtn } from '../../interface/Table'
 // import axios from 'axios';
 import http from '../../plugins/http';
 import TableSave from './TableSave.vue'
@@ -71,7 +71,7 @@ const parents = withDefaults(defineProps<{
     rootUrl?: String,
     page?: PageParam,
     columns?: Array<Column>,
-    optionBtn?: any
+    optionBtn?: OptionBtn
 }>(), {
     rootUrl: () => "",
     page: () => {
@@ -97,7 +97,7 @@ let url = {
     delAll: parents.rootUrl + "/deleteAll",
 };
 // 按钮控制
-let localOptionBtn = ref<any>({
+let localOptionBtn = ref<OptionBtn>({
     search: true, // 开启查询功能
     searchParam: true, // 开启查询功能
     sort: true, // 开启排序功能
@@ -105,7 +105,7 @@ let localOptionBtn = ref<any>({
     page: true, // 翻页
     opt: true, // 每条数据后端操作搭配optbtn使用
     optbtn: { // 
-        info: true, // 详细
+        info: true, // 详细 暂时无用
         upd: true, // 修改
         state: true, // 修改表中应有固定字段 delete_flag 默认值为0 逻辑删除字段 执行update 
         del: true, // 删除 执行delete sql
