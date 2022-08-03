@@ -1,26 +1,40 @@
-
 <template>
+  <!-- <keep-alive> -->
   <Admin v-if="viewF === ViewType.Admin" />
   <Index v-if="viewF === ViewType.User" />
   <Login v-if="viewF === ViewType.Login" />
   <Error v-if="viewF === ViewType.Error" />
+  <!-- </keep-alive> -->
 </template>
-<script setup   lang="ts">
+<script setup lang="ts">
+import { ref } from "vue";
+import Admin from "./views/Admin.vue";
+import Index from "./views/index.vue";
+import Login from "./views/Login.vue";
+import Error from "./views/Error.vue";
 
+import { ViewType } from "./interface/View";
 
-import Admin from './views/Admin.vue'
-import Index from './views/index.vue'
-import Login from './views/Login.vue'
-import Error from './views/Error.vue'
+import { userStore } from "@store/user";
 
+// 实例化仓库
+const store = userStore();
+// 获取数据
+const userinfo = store.userinfo;
 
-import { ViewType } from './interface/View'
-
-// TODO 判断登录后信息展示 默认登录页面 
-let viewF: ViewType = ViewType.Admin;
-
-
-
+let viewF = ref<ViewType>(ViewType.Login);
+if (userinfo == null) {
+  viewF.value = ViewType.Login;
+} else {
+  // 判断登录后信息展示 默认登录页面
+  if (userinfo.roles?.includes("admin")) {
+    viewF.value = ViewType.Admin;
+  } else if (userinfo.roles?.includes("user")) {
+    viewF.value = ViewType.User;
+  } else {
+    viewF.value = ViewType.Login;
+  }
+}
 </script>
 
 <style>

@@ -23,19 +23,21 @@
     </div>
 </template>
 <script lang="ts" setup>
-import TableSortColumnSelect from './TableSortColumnSelect.vue'
-import { onMounted, ref, getCurrentInstance } from 'vue';
-import { SortColumn } from '../../interface/Table'
+import TableSortColumnSelect from "./TableSortColumnSelect.vue";
+import { onMounted, ref, getCurrentInstance } from "vue";
+import { SortColumn } from "../../interface/Table";
 
-const parents = withDefaults(defineProps<{
-    sortColumns: Array<SortColumn>,
-    sortParameters: Array<SortColumn>
-}>(), {
-    sortColumns: () => [],
-    item: () => [],
-});
-let
-    columns = ref<Array<SortColumn>>([]),
+const parents = withDefaults(
+    defineProps<{
+        sortColumns: Array<SortColumn>;
+        sortParameters: Array<SortColumn>;
+    }>(),
+    {
+        sortColumns: () => [],
+        item: () => [],
+    }
+);
+let columns = ref<Array<SortColumn>>([]),
     orderSize = ref<number>(0),
     plusNum = ref<number>(0),
     columnsSize = ref<number>(0);
@@ -66,11 +68,11 @@ function handleAddSort() {
     for (let index = 0; index < parents.sortColumns.length; index++) {
         const i1 = parents.sortColumns[index];
         let a: Boolean = true;
-        parents.sortParameters.forEach(item => {
+        parents.sortParameters.forEach((item) => {
             if (item.sortName === i1.sortName) {
                 a = false;
             }
-        })
+        });
         if (a) {
             parents.sortParameters.push(i1);
             // 计算数量的
@@ -81,49 +83,47 @@ function handleAddSort() {
             return;
         }
     }
-};
+}
 
 // 删除排序条件
 function handleDelSort(item: SortColumn, index: number) {
     parents.sortParameters.splice(index, 1);
     orderSize.value--;
     handleSortIndex();
-};
+}
 
 // 条件前移
 function handleTopSort(item: SortColumn, index: number) {
     parents.sortParameters.splice(index, 1);
     parents.sortParameters.splice(index - 1, 0, item);
     handleSortIndex();
-};
+}
 
 // 排序
 function handleSortIndex() {
     let a = 1;
-    parents.sortParameters.forEach(item => {
+    parents.sortParameters.forEach((item) => {
         item.sortIndex = a;
         parents.sortParameters.splice(a - 1, 1, item);
         a++;
     });
-};
+}
 
 // 取排序
 function handleSort() {
     emit("sortTable");
-};
+}
 
 // 排序顺序控制
 function handleSortOrder(item: SortColumn, index: number) {
-    if (item.sortOrder == 'asc') {
+    if (item.sortOrder == "asc") {
         item.sortOrder = "desc";
     } else {
         item.sortOrder = "asc";
     }
-};
-
-
+}
 </script>
-<style lang="scss" scoped >
+<style lang="scss" scoped>
 #TableSortParameters {
     margin: 0px;
     padding: 8px;

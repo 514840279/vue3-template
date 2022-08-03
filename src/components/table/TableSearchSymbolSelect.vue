@@ -1,32 +1,34 @@
 <template>
     <div id="TableSearchSymbolSelect">
-        <el-select v-model="item.symbol" size="small" style="width:100%" @change="handleChangeSymbol">
-            <el-option v-for="(sy, idx) in symbols" :key="idx" :label="sy.label" :value="sy.value">
-            </el-option>
+        <el-select v-model="item.symbol" size="small" style="width: 100%" @change="handleChangeSymbol" :filterable="true">
+            <el-option v-for="(sy, idx) in symbols" :key="idx" :label="sy.label" :value="sy.value"> </el-option>
         </el-select>
     </div>
 </template>
 <script lang="ts" setup>
-import { SearchParamters } from '../../interface/Table'
+import { SearchParamters } from "../../interface/Table";
 
-const parents = withDefaults(defineProps<{
-    item?: SearchParamters,
-    index?: Number,
-    parameters: Array<SearchParamters>
-}>(), {
-    item: () => {
-        return {
-            operator: 'eq',
-            column: "不知道",
-            title: "不知道",
-            symbol: "不知道",
-            data: "不知道",
-            showdata: false
-        }
-    },
-    index: () => 0,
-    parameters: () => [],
-});
+const parents = withDefaults(
+    defineProps<{
+        item?: SearchParamters;
+        index?: Number;
+        parameters: Array<SearchParamters>;
+    }>(),
+    {
+        item: () => {
+            return {
+                operator: "eq",
+                column: "不知道",
+                title: "不知道",
+                symbol: "不知道",
+                data: "不知道",
+                showdata: false,
+            };
+        },
+        index: () => 0,
+        parameters: () => [],
+    }
+);
 
 const symbols = [
     { label: "相等", value: "eq" },
@@ -39,7 +41,6 @@ const symbols = [
     { label: "为空", value: "isNull" },
     { label: "不为空", value: "isNotNull" },
 ];
-
 
 function handleChangeSymbol(va: String) {
     switch (va) {
@@ -62,15 +63,12 @@ function handleChangeSymbol(va: String) {
             parents.item.showdata = true;
             break;
     }
-
 }
-
 </script>
 <style scoped>
 #TableSearchSymbolSelect {
     margin: 0px;
     padding: 0px;
     width: 100%;
-
 }
 </style>

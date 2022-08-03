@@ -4,7 +4,7 @@
             <template #reference>
                 <el-button icon="CaretBottom" circle size="small" title="列选择"></el-button>
             </template>
-            <el-checkbox-group v-model="checkList" @change="filter" style="max-width:1500px;">
+            <el-checkbox-group v-model="checkList" @change="filter" style="max-width: 1500px">
                 <ul class="infinite-list" style="overflow: auto">
                     <li v-for="(item, index) in tableList" :key="index" class="infinite-list-item">
                         <el-checkbox v-model="item.title" :label="item.title" size="small"></el-checkbox>
@@ -15,15 +15,17 @@
     </div>
 </template>
 <script lang="ts" setup>
+import { onBeforeMount, ref } from "vue";
+import { Column } from "../../interface/Table";
 
-import { onBeforeMount, ref } from 'vue';
-import { Column } from '../../interface/Table'
-
-const parents = withDefaults(defineProps<{
-    columns?: Array<Column>
-}>(), {
-    columns: () => []
-});
+const parents = withDefaults(
+    defineProps<{
+        columns?: Array<Column>;
+    }>(),
+    {
+        columns: () => [],
+    }
+);
 
 let tableList = ref<Array<Column>>([]),
     checkList = ref<Array<any>>([]),
@@ -42,13 +44,13 @@ onBeforeMount(() => {
         if (item.show) {
             checkList.value.push(item.title);
         }
-        list.value.push(item.title)
+        list.value.push(item.title);
     });
 });
 
 function filter(val: Array<String>) {
-    result = list.value.filter(number => !val.includes(number))
-    // console.log('result',result)
+    result = list.value.filter((number) => !val.includes(number));
+
     if (result.length >= 1) {
         result.forEach((item, index) => {
             tableList.value.forEach((items, indexs) => {
@@ -65,13 +67,10 @@ function filter(val: Array<String>) {
             }
         });
     });
-    emit('update:columns', tableList.value);
+    emit("update:columns", tableList.value);
 }
-
-
-
 </script>
-<style scoped  lang="scss">
+<style scoped lang="scss">
 #TableColumnSelect {
     font-size: 20px;
     padding: 0px;
@@ -80,7 +79,6 @@ function filter(val: Array<String>) {
     white-space: nowrap;
     display: inline-block;
     min-height: 40px;
-
 }
 
 .infinite-list {

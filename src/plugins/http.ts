@@ -10,7 +10,7 @@ class ServiceRequest {
   instance: AxiosInstance//axios的实例将被保存到这里
   constructor(config: AxiosRequestConfig) {//构造器里的config包括baseURL，timeout等
     this.instance = axios.create(config)//创建axios实例
-    
+
     // 设置 post、put 默认 Content-Type
     this.instance.defaults.headers.post['Content-Type'] = 'application/json';
     this.instance.defaults.headers.put['Content-Type'] = 'application/json';
@@ -26,10 +26,10 @@ class ServiceRequest {
       }
     )
     this.instance.interceptors.response.use(//实例中的响应拦截器
-      (response:any) => {
+      (response: any) => {
         //响应成功的拦截
-        if (response.status ==ResponseErrorType.SUCCESS) {
-          
+        if (response.status == ResponseErrorType.SUCCESS) {
+
           switch (response.data.code) {
             // 确定的错误
             case ResponseErrorType.ERROR_1:
@@ -57,7 +57,7 @@ class ServiceRequest {
           message: error,
           type: 'error',
         })
-       //响应失败的拦截
+        //响应失败的拦截
         return Promise.reject(error)
       }
     )
@@ -67,7 +67,7 @@ class ServiceRequest {
     return new Promise((resolve, reject) => {
       this.instance
         .request<any, T>(config)
-        .then((res:any) => {
+        .then((res: any) => {
           resolve(res.data)// 将结果返回出去 最终结果data：ResponseClass
         })
         .catch((err) => {
@@ -76,21 +76,24 @@ class ServiceRequest {
         })
     })
   }
-  get<T>(url:string,data?:any,config?: AxiosRequestConfig): Promise<T> {
-    return this.request<T>({ ...config,url:url, data:data, method: 'GET' })
+  get<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    return this.request<T>({ ...config, url: url, data: data, method: 'GET' })
   }
-  post<T>(url:string,data?:any,config?: AxiosRequestConfig): Promise<T> {
-    return this.request<T>({ ...config, url:url, data:data, method: 'POST' })
+  post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    return this.request<T>({ ...config, url: url, data: data, method: 'POST' })
   }
-  delete<T>(url:string,data?:any,config?: AxiosRequestConfig): Promise<T> {
-    return this.request<T>({ ...config, url:url, data:data,method: 'DELETE' })
+  delete<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    return this.request<T>({ ...config, url: url, data: data, method: 'DELETE' })
   }
-  patch<T>(url:string,data?:any,config?: AxiosRequestConfig): Promise<T> {
-    return this.request<T>({ ...config,url:url, data:data, method: 'PATCH' })
+  patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    return this.request<T>({ ...config, url: url, data: data, method: 'PATCH' })
+  }
+  download<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    return this.request<T>({ ...config, url: url, data: data, method: 'POST', responseType: "blob" })
   }
 }
-const  http:ServiceRequest = new ServiceRequest({
-  timeout: 1500 // 可适当调整
+const http: ServiceRequest = new ServiceRequest({
+  timeout: 3000 // 可适当调整
 });
 
 export default http;
