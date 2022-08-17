@@ -1,29 +1,31 @@
 <template>
   <div class="bg-box">
-    <el-form ref="loginFormRef" :model="loginForm" status-icon :rules="rules" size="large" label-width="100px" class="loginForm">
-      <h1 class="title">{{ title }}</h1>
-      <el-form-item label="用户名" prop="name">
-        <el-input v-model="loginForm.name" autocomplete="off" />
-      </el-form-item>
-      <el-form-item label="密码" prop="password">
-        <el-input v-model="loginForm.password" type="password" autocomplete="off" />
-      </el-form-item>
-      <el-form-item>
-        <el-button class="sub-btn" type="primary" @click="submitForm()">确定</el-button>
-      </el-form-item>
-    </el-form>
+    <el-card class="box-card">
+      <el-form ref="loginFormRef" :model="loginForm" status-icon :rules="rules" size="large" label-width="80px" class="loginForm">
+        <h1 class="title">{{ title }}</h1>
+        <el-form-item label="用户名" prop="name">
+          <el-input v-model="loginForm.name" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="loginForm.password" type="password" autocomplete="off" />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="sub-btn" type="primary" @click="submitForm()">确定</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import {LoginForm} from '../interface/Login'
+import { LoginForm } from '../interface/Login'
 
-const title: String = "登录系统";
+const title: String = "登录";
 
 let loginForm = ref<LoginForm>({
-  name: "312",
-  password: "123",
+  name: "wth",
+  password: "123456",
 });
 
 const rules = {
@@ -39,6 +41,8 @@ const rules = {
 
 function submitForm() {
   console.log(loginForm.value);
+
+
 }
 </script>
 
@@ -52,18 +56,23 @@ body {
 .bg-box {
   width: 100%;
   height: 100%;
-  background-image: url("../assets/log-background/bg1.jpg");
+  // background-image: url("../assets/log-background/bg1.jpg");
   background-size: cover;
   background-attachment: fixed;
   /*关键*/
   background-position: top;
   overflow-y: hidden;
   min-height: 697px;
-  padding-top: 250px;
+  padding-top: 180px;
   zoom: 1;
 
+  .box-card {
+    width: 45%;
+    margin: auto;
+  }
+
   .loginForm {
-    width: 550px;
+    width: 450px;
     height: 300px;
     background-color: white;
     padding-top: 20px;
