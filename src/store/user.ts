@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { UserInfo } from "@interface/Login";
 
 // 定义用户信息类型，这里的权限应该从数据库中获取，这里写上用于测试
-let info: UserInfo | undefined | null = null;
+let info: UserInfo | undefined | null = { roles: ['admin'] };
 // useStore could be anything like useUser, useCart
 // the first argument is a unique id of the store across your application
 export const userStore = defineStore('user', {
